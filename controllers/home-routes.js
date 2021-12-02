@@ -8,12 +8,11 @@ router.get('/', (req, res)=>{
             'id',
             'title',
             'content',
-            'created_at'
         ],
         include: [
             {
                 model: Comment,
-                attributes:['id', 'user_id', 'post_id', 'comment_body', 'created_at'],
+                attributes:['id', 'user_id', 'post_id', 'comment_body'],
                 include:{
                     model: User,
                     attributes:['username', 'github']
@@ -21,7 +20,7 @@ router.get('/', (req, res)=>{
             },
             {
                 model: User,
-                attributes: ['username', 'twitter', 'github']
+                attributes: ['username', 'github']
             }
         ]
     })
