@@ -1,19 +1,21 @@
 <div class="container">
-        <div class="card mb-5">
-          <div class="row justify-content-around card-header">
-            <div class="col-md-6">By {{user.username}}</div>
+  <div class="card mb-5">
+    <div class="row justify-content-around card-header">
+      <div class="col-md-6">By {{user.username}}</div>
 
-            <div class="col-md-6 ">
-              <a href="https://github.com/{{user.github}}"><i class="fab fa-github"></i></a>
-              |
-               <a href="/post/{{id}}">{{comments.length}} {{format_plural "comment" comments.length}}</a>
-            </div>
-          </div>
-          <div class="card-body">
-            <h5 class="card-title">{{title}}</h5>
-            <p class="card-text">
-                {{content}}
-            </p>
-          </div>
-        </div>
+      <div class="col-md-6 ">
+        <a href="https://github.com/{{user.github}}"><i class="fab fa-github"></i></a>
+        |
+        {{format_date date_created}}
+        |
+          <a href="/post/{{id}}">{{comments.length}} {{format_plural "comment" comments.length}}</a>
       </div>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">{{title}}</h5>
+      <p class="card-text">
+          {{content}}
+      </p>
+    </div>
+  </div>
+</div>
