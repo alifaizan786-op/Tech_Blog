@@ -1,43 +1,38 @@
 const router = require('express').Router();
 const sequelize = require('../config/connection')
-const { Post, User, Comment} = require('../models');
+const {Post, User, Comment} = require('../models');
 
-router.get('/', (req, res)=>{
-    Post.findAll({
-        attributes: [
-            'id',
-            'title',
-            'content',
-            'date_created'
-        ],
-        include: [
-            {
-                model: Comment,
-                attributes:['id', 'user_id', 'post_id', 'comment_body'],
-                include:{
-                    model: User,
-                    attributes:['username', 'github']
-                }
-            },
-            {
-                model: User,
-                attributes: ['username', 'github']
-            }
-        ]
-    })
-    .then(dbPostData=> {
-        const posts = dbPostData.map(post => post.get({ plain:true }));
+router.get('/',async (req, res) => {
+    try {
+        const postData =  await Post.findAll({
+            include: [
+                {
+                  model: User,
+                  attributes: ['username', 'github'],
+                },
+                {
+                    model: Comment,
+                    attributes: ['user_id', 'post_id', 'comment_body', 'date_created'],
+                },
+              ],
+        });
+        console.log(postData)
+        const posts = postData.map((post) => post.get({plain: true}));
+        console.log(posts)
+       
         res.render('homepage', {
             posts,
-            loggedIn : req.session.loggedIn
+             loggedIn: req.session.loggedIn
         });
-    })
-    .catch(err=> {
+
+    } catch (err) {
+        console.log(err)
         res.status(500).json(err);
-    });
+    }
 });
 
-router.get('/login', (req,res) => {
+
+router.get('/login', (req, res) => {
     if (req.session.loggedIn) {
         res.redirect('/');
         return;
@@ -46,7 +41,7 @@ router.get('/login', (req,res) => {
     res.render('signup')
 });
 
-router.get('/signup', (req,res) => {
+router.get('/signup', (req, res) => {
     if (req.session.loggedIn) {
         res.redirect('/');
         return;
@@ -55,56 +50,33 @@ router.get('/signup', (req,res) => {
     res.render('signup')
 });
 
-router.get('/post/:id', (req, res)=>{
-    Post.findOne({
-        where: {
-            id: req.params.id
-        },
-        attributes: [
-            'id',
-            'title',
-            'content',
-            'date_created'
-        ],
-        include: [
-            {
-                model: Comment,
-                attributes:['id', 'user_id', 'post_id', 'comment_body','date_created'],
-                include:{
-                    model: User,
-                    attributes:['username', 'github']
-                }
-            },
-            {
-                model: User,
-                attributes: ['username', 'github']
-            }
-        ]
-    })
-    .then(dbPostData=> {
-        if (!dbPostData) {
-            res.status(404).json({ message: 'No post found with this id' })
-        }
-
-        //Serialized Data
-        const posts = dbPostData.map(post => post.get({ plain:true }));
-
-        // sending data to template
+router.get('/post/:id', async (req, res) => {
+    try {
+        const postData =  await Post.findOne({
+            where :{ id: req.params.id},
+            include: [
+                {
+                  model: User,
+                  attributes: ['username', 'github'],
+                },
+                {
+                    model: Comment,
+                    attributes: ['user_id', 'post_id', 'comment_body', 'date_created'],
+                },
+              ],
+         });
+         const post = postData.get({ plain: true });
+       console.log(post)
         res.render('singlepost', {
-            posts,
-            loggedIn : req.session.loggedIn
+            ...post,
+             loggedIn: req.session.loggedIn
         });
-    })
-    .catch(err=> {
+
+    } catch (err) {
+        console.log(err)
         res.status(500).json(err);
-    });
+    }
 });
-
-
-
-
-
-
 
 
 module.exports = router;
