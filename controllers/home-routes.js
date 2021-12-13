@@ -38,7 +38,7 @@ router.get('/login', (req, res) => {
         return;
     }
 
-    res.render('signup')
+    res.render('login')
 });
 
 router.get('/signup', (req, res) => {
@@ -56,19 +56,23 @@ router.get('/post/:id', async (req, res) => {
             where :{ id: req.params.id},
             include: [
                 {
-                  model: User,
-                  attributes: ['username', 'github'],
+                  model: Comment,
+                  attributes: ['id', 'comment_body', 'post_id', 'user_id', 'date_created'],
+                  include: {
+                    model: User,
+                    attributes: ['username', 'github']
+                  }
                 },
                 {
-                    model: Comment,
-                    attributes: ['user_id', 'post_id', 'comment_body', 'date_created'],
-                },
-              ],
+                  model: User,
+                  attributes: ['username', 'github']
+                }
+              ]
          });
          const post = postData.get({ plain: true });
        console.log(post)
         res.render('singlepost', {
-            ...post,
+            post,
              loggedIn: req.session.loggedIn
         });
 
